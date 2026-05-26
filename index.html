@@ -308,6 +308,188 @@
     z-index: 5;
     opacity: 0.75;
   }
+
+  /* ============================================================
+     GM EDITOR (only shown when ?gm is in the URL)
+     ============================================================ */
+  #gm-toggle {
+    position: fixed;
+    top: 18px; right: 18px;
+    z-index: 12;
+    background: var(--ink);
+    color: var(--bone);
+    font-family: 'IM Fell English SC', serif;
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    padding: 8px 14px;
+    border: 1px solid var(--gold);
+    cursor: pointer;
+    box-shadow: 2px 3px 0 rgba(42,31,16,0.2);
+    display: none;
+  }
+  #gm-toggle.shown { display: block; }
+  #gm-toggle:hover { background: var(--rust); }
+  #gm-toggle.active { background: var(--rust); }
+
+  #gm-editor {
+    position: fixed;
+    left: -540px;
+    top: 60px; bottom: 16px;
+    width: 520px;
+    background: var(--bone);
+    border: 1px solid rgba(74, 56, 32, 0.5);
+    box-shadow: 4px 0 14px rgba(42, 31, 16, 0.18);
+    padding: 22px 26px 30px;
+    overflow-y: auto;
+    transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 13;
+  }
+  #gm-editor.open { left: 16px; }
+  #gm-editor::before {
+    content: '';
+    position: absolute; inset: 6px;
+    border: 1px solid rgba(168, 123, 42, 0.3);
+    pointer-events: none;
+  }
+  #gm-editor h2 {
+    font-family: 'IM Fell English SC', serif;
+    font-weight: 400;
+    font-size: 22px;
+    letter-spacing: 0.06em;
+    text-align: center;
+    margin: 4px 0 4px;
+  }
+  #gm-editor .gm-subtitle {
+    text-align: center;
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-bottom: 14px;
+  }
+  #gm-editor .gm-divider {
+    text-align: center; color: var(--rust);
+    letter-spacing: 0.4em; font-size: 16px;
+    margin: 14px 0 10px;
+  }
+  #gm-editor label {
+    display: block;
+    font-family: 'IM Fell English SC', serif;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--ink-soft);
+    margin: 10px 0 3px;
+  }
+  #gm-editor input[type=text],
+  #gm-editor input[type=number],
+  #gm-editor select,
+  #gm-editor textarea {
+    width: 100%;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    padding: 6px 8px;
+    background: var(--parchment);
+    border: 1px solid rgba(74,56,32,0.4);
+    color: var(--ink);
+    box-sizing: border-box;
+  }
+  #gm-editor textarea {
+    min-height: 70px;
+    resize: vertical;
+    line-height: 1.4;
+  }
+  #gm-editor .row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  #gm-editor .row-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+  }
+
+  #gm-relationships .gm-rel {
+    border: 1px dashed rgba(74,56,32,0.35);
+    padding: 8px 10px;
+    margin: 8px 0;
+    background: rgba(237, 224, 196, 0.4);
+    position: relative;
+  }
+  #gm-relationships .gm-rel .gm-rel-remove {
+    position: absolute; top: 4px; right: 6px;
+    cursor: pointer; background: none; border: none;
+    color: var(--rust); font-family: 'IM Fell English', serif;
+    font-size: 16px;
+  }
+  #gm-relationships .gm-rel label { margin: 6px 0 2px; font-size: 10px; }
+  #gm-add-rel {
+    width: 100%; margin-top: 6px;
+    background: rgba(168, 123, 42, 0.15);
+    border: 1px dashed var(--gold);
+    padding: 8px;
+    color: var(--ink-soft);
+    cursor: pointer;
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+  }
+  #gm-add-rel:hover { background: rgba(168, 123, 42, 0.3); }
+
+  #gm-editor .gm-actions {
+    margin-top: 18px;
+    display: flex; gap: 10px; flex-direction: column;
+  }
+  #gm-editor .gm-actions button {
+    font-family: 'IM Fell English SC', serif;
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    padding: 10px 14px;
+    border: 1px solid var(--ink);
+    cursor: pointer;
+    background: var(--parchment-dark);
+    color: var(--ink);
+  }
+  #gm-editor .gm-actions button:hover { background: var(--gold); color: var(--bone); }
+  #gm-editor .gm-actions button.primary {
+    background: var(--ink);
+    color: var(--bone);
+    border-color: var(--gold);
+  }
+  #gm-editor .gm-actions button.primary:hover { background: var(--rust); }
+  #gm-editor .gm-actions button:disabled {
+    opacity: 0.4; cursor: not-allowed;
+  }
+  #gm-editor .gm-actions .gm-row { display: flex; gap: 10px; }
+  #gm-editor .gm-actions .gm-row button { flex: 1; }
+
+  #gm-status {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--ink-soft);
+    text-align: center;
+    margin-top: 10px;
+    min-height: 18px;
+  }
+  #gm-status.success { color: var(--moss); }
+  #gm-status.error { color: var(--rust); }
+
+  #gm-snippet {
+    width: 100%;
+    min-height: 120px;
+    font-family: 'Menlo', 'Consolas', monospace;
+    font-size: 11px;
+    padding: 8px;
+    background: var(--ink);
+    color: var(--bone);
+    border: 1px solid var(--gold);
+    margin-top: 10px;
+    display: none;
+    box-sizing: border-box;
+    line-height: 1.4;
+    resize: vertical;
+  }
+  #gm-snippet.shown { display: block; }
 </style>
 </head>
 <body>
@@ -366,6 +548,86 @@
   <div class="body-text" id="d-body"></div>
   <div class="section-label" id="d-rel-label">Bonds</div>
   <ul class="rel-list" id="d-rels"></ul>
+</div>
+
+<button id="gm-toggle" title="Press 'e' to toggle">GM Quill</button>
+
+<div id="gm-editor">
+  <h2>The GM's Quill</h2>
+  <div class="gm-subtitle">add a soul and their bonds to the web</div>
+  <div class="gm-divider">· · ❦ · ·</div>
+
+  <label>Name (id)</label>
+  <input type="text" id="gm-id" placeholder="e.g. Aeryn the Cooper">
+
+  <div class="row">
+    <div>
+      <label>Circle</label>
+      <select id="gm-group">
+        <option value="wynn">Wynn's circle</option>
+        <option value="sorsha">Sorsha's circle</option>
+        <option value="lim">Lim's circle</option>
+        <option value="anxo">Anxo's circle</option>
+        <option value="bridge">Bridge folk</option>
+      </select>
+    </div>
+    <div>
+      <label>Size (node radius)</label>
+      <select id="gm-size">
+        <option value="8">Tiny (children, minor folk)</option>
+        <option value="11" selected>Small (background NPC)</option>
+        <option value="12">Medium (named NPC)</option>
+        <option value="14">Large (important figure)</option>
+        <option value="22">Huge (PC only)</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="row-3">
+    <div>
+      <label>Age</label>
+      <input type="number" id="gm-age" placeholder="0 = unknown" min="0">
+    </div>
+    <div>
+      <label>Pronouns</label>
+      <input type="text" id="gm-pronouns" placeholder="she/her">
+    </div>
+    <div>
+      <label>Location</label>
+      <input type="text" id="gm-loc" placeholder="Stonetop">
+    </div>
+  </div>
+
+  <label>Portrait (path or URL, optional)</label>
+  <input type="text" id="gm-portrait" placeholder="portraits/name.png">
+
+  <label>Player Character?</label>
+  <select id="gm-pc">
+    <option value="false">No</option>
+    <option value="true">Yes</option>
+  </select>
+
+  <label>Description / backstory</label>
+  <textarea id="gm-body" placeholder="A few sentences of who they are."></textarea>
+
+  <div class="gm-divider">· · ❦ · ·</div>
+
+  <label style="margin-top:4px;">Relationships</label>
+  <div id="gm-relationships"></div>
+  <button id="gm-add-rel" type="button">+ add a bond</button>
+
+  <div class="gm-divider">· · ❦ · ·</div>
+
+  <div class="gm-actions">
+    <button class="primary" id="gm-save">Save to file (Chrome/Edge)</button>
+    <div class="gm-row">
+      <button id="gm-snippet-btn">Show snippet</button>
+      <button id="gm-clear">Clear form</button>
+    </div>
+  </div>
+
+  <div id="gm-status"></div>
+  <textarea id="gm-snippet" readonly placeholder="Snippet will appear here"></textarea>
 </div>
 
 <div id="footer-hint">edit the <code style="font-family:inherit; background:rgba(0,0,0,0.05); padding:1px 4px;">NPC_DATA</code> block inside this file to add NPCs and bonds</div>
@@ -1230,6 +1492,293 @@ function openDetail(d, allNodes, allLinks) {
   document.getElementById('d-rel-label').textContent = rels.length ? 'Bonds' : 'No recorded bonds';
   detail.classList.add('open');
 }
+
+// ============================================================
+// GM EDITOR — only activates with ?gm in the URL
+// Builds new NPCs + their relationships and writes them
+// directly to this index.html file via the File System Access API
+// (Chrome/Edge only). Falls back to clipboard snippet otherwise.
+// ============================================================
+(function gmEditor() {
+  const params = new URLSearchParams(window.location.search);
+  if (!params.has('gm')) return;
+
+  // Reveal the toggle button
+  const toggle = document.getElementById('gm-toggle');
+  const editor = document.getElementById('gm-editor');
+  toggle.classList.add('shown');
+
+  function toggleEditor() {
+    editor.classList.toggle('open');
+    toggle.classList.toggle('active');
+  }
+  toggle.addEventListener('click', toggleEditor);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'e' && !['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) {
+      toggleEditor();
+    }
+  });
+
+  // --- Relationship row management ---
+  const relsContainer = document.getElementById('gm-relationships');
+  const addRelBtn = document.getElementById('gm-add-rel');
+
+  // We need the list of existing NPC ids for the datalist
+  // Pull it fresh in case the page is re-rendered
+  function getAllIds() {
+    return NPC_DATA.nodes.map(n => n.id).sort();
+  }
+
+  // Datalist for autocompletion of existing names
+  const datalist = document.createElement('datalist');
+  datalist.id = 'gm-npc-list';
+  getAllIds().forEach(id => {
+    const opt = document.createElement('option');
+    opt.value = id;
+    datalist.appendChild(opt);
+  });
+  document.body.appendChild(datalist);
+
+  function addRelationshipRow(prefill = {}) {
+    const idx = relsContainer.children.length;
+    const div = document.createElement('div');
+    div.className = 'gm-rel';
+    div.innerHTML = `
+      <button class="gm-rel-remove" type="button" title="remove">✕</button>
+      <label>Other person (exact name)</label>
+      <input type="text" class="gm-rel-other" list="gm-npc-list" placeholder="Type or pick existing name" value="${prefill.other || ''}">
+      <div class="row">
+        <div>
+          <label>Type</label>
+          <select class="gm-rel-type">
+            <option value="kin">kin</option>
+            <option value="romance">romance</option>
+            <option value="friend">friend</option>
+            <option value="mentor">mentor</option>
+            <option value="grudge">grudge</option>
+            <option value="secret">secret</option>
+          </select>
+        </div>
+        <div>
+          <label>Direction</label>
+          <select class="gm-rel-dir">
+            <option value="mutual">mutual (both)</option>
+            <option value="from">from new NPC → other</option>
+            <option value="to">other → new NPC</option>
+          </select>
+        </div>
+      </div>
+      <label>Label / description</label>
+      <input type="text" class="gm-rel-label" placeholder="e.g. blood sister, owes a debt" value="${prefill.label || ''}">
+    `;
+    div.querySelector('.gm-rel-remove').addEventListener('click', () => div.remove());
+    if (prefill.type) div.querySelector('.gm-rel-type').value = prefill.type;
+    if (prefill.dir) div.querySelector('.gm-rel-dir').value = prefill.dir;
+    relsContainer.appendChild(div);
+  }
+  addRelBtn.addEventListener('click', () => addRelationshipRow());
+
+  // --- Collect form into node + links ---
+  function collectForm() {
+    const id = document.getElementById('gm-id').value.trim();
+    if (!id) throw new Error('Name is required');
+
+    // Reject if id already exists in the data
+    if (NPC_DATA.nodes.some(n => n.id === id)) {
+      throw new Error(`An NPC named "${id}" already exists`);
+    }
+
+    const node = {
+      id,
+      group: document.getElementById('gm-group').value,
+      age: parseInt(document.getElementById('gm-age').value || '0', 10) || 0,
+      pronouns: document.getElementById('gm-pronouns').value.trim(),
+      loc: document.getElementById('gm-loc').value.trim(),
+      size: parseInt(document.getElementById('gm-size').value, 10),
+      portrait: document.getElementById('gm-portrait').value.trim(),
+      body: document.getElementById('gm-body').value.trim()
+    };
+    if (document.getElementById('gm-pc').value === 'true') node.pc = true;
+
+    // Collect relationships
+    const newLinks = [];
+    relsContainer.querySelectorAll('.gm-rel').forEach(row => {
+      const other = row.querySelector('.gm-rel-other').value.trim();
+      if (!other) return;
+
+      const knownIds = getAllIds();
+      if (!knownIds.includes(other)) {
+        throw new Error(`Relationship target "${other}" doesn't exist. Add the NPC first, or check spelling.`);
+      }
+
+      const type = row.querySelector('.gm-rel-type').value;
+      const dir = row.querySelector('.gm-rel-dir').value;
+      const label = row.querySelector('.gm-rel-label').value.trim();
+
+      const link = { type, label };
+      if (dir === 'to') {
+        link.source = other;
+        link.target = id;
+        link.directed = true;
+      } else if (dir === 'from') {
+        link.source = id;
+        link.target = other;
+        link.directed = true;
+      } else {
+        link.source = id;
+        link.target = other;
+      }
+      // Re-order fields for cleaner JSON output
+      const ordered = { source: link.source, target: link.target, type: link.type, label: link.label };
+      if (link.directed) ordered.directed = true;
+      newLinks.push(ordered);
+    });
+
+    return { node, newLinks };
+  }
+
+  // --- Status helper ---
+  const statusEl = document.getElementById('gm-status');
+  function status(msg, cls = '') {
+    statusEl.textContent = msg;
+    statusEl.className = cls;
+  }
+
+  // --- Snippet output ---
+  const snippetEl = document.getElementById('gm-snippet');
+  document.getElementById('gm-snippet-btn').addEventListener('click', () => {
+    try {
+      const { node, newLinks } = collectForm();
+      const lines = [];
+      lines.push('// Add to NPC_DATA.nodes:');
+      lines.push(JSON.stringify(node, null, 2) + ',');
+      if (newLinks.length) {
+        lines.push('');
+        lines.push('// Add to NPC_DATA.links:');
+        newLinks.forEach(l => lines.push(JSON.stringify(l) + ','));
+      }
+      snippetEl.value = lines.join('\n');
+      snippetEl.classList.add('shown');
+      snippetEl.select();
+      try { document.execCommand('copy'); status('Snippet copied to clipboard', 'success'); }
+      catch { status('Snippet shown below — copy manually', ''); }
+    } catch (err) {
+      status(err.message, 'error');
+    }
+  });
+
+  // --- Clear form ---
+  document.getElementById('gm-clear').addEventListener('click', () => {
+    if (!confirm('Clear all fields?')) return;
+    ['gm-id','gm-age','gm-pronouns','gm-loc','gm-portrait','gm-body'].forEach(i => document.getElementById(i).value = '');
+    document.getElementById('gm-group').value = 'wynn';
+    document.getElementById('gm-size').value = '11';
+    document.getElementById('gm-pc').value = 'false';
+    relsContainer.innerHTML = '';
+    snippetEl.classList.remove('shown');
+    status('');
+  });
+
+  // --- File System Access API integration ---
+  // Stores the file handle once granted so subsequent saves don't re-prompt.
+  let fileHandle = null;
+
+  async function pickFile() {
+    if (!window.showOpenFilePicker) {
+      throw new Error('Direct save needs Chrome or Edge. Use "Show snippet" instead.');
+    }
+    [fileHandle] = await window.showOpenFilePicker({
+      types: [{ description: 'HTML', accept: { 'text/html': ['.html'] } }]
+    });
+  }
+
+  async function writeBackToFile() {
+    if (!fileHandle) await pickFile();
+
+    // Verify write permission
+    const perm = await fileHandle.queryPermission({ mode: 'readwrite' });
+    if (perm !== 'granted') {
+      const req = await fileHandle.requestPermission({ mode: 'readwrite' });
+      if (req !== 'granted') throw new Error('Write permission denied');
+    }
+
+    const file = await fileHandle.getFile();
+    const text = await file.text();
+
+    // Find the NPC_DATA assignment block and parse it
+    const startMarker = 'const NPC_DATA = ';
+    const startIdx = text.indexOf(startMarker);
+    if (startIdx === -1) throw new Error('Could not find NPC_DATA in file');
+
+    // The JSON starts at startIdx + startMarker.length
+    // Find the matching closing brace by counting nesting
+    const jsonStart = startIdx + startMarker.length;
+    let depth = 0;
+    let inString = false;
+    let escape = false;
+    let jsonEnd = -1;
+    for (let i = jsonStart; i < text.length; i++) {
+      const ch = text[i];
+      if (escape) { escape = false; continue; }
+      if (ch === '\\') { escape = true; continue; }
+      if (ch === '"') { inString = !inString; continue; }
+      if (inString) continue;
+      if (ch === '{') depth++;
+      else if (ch === '}') {
+        depth--;
+        if (depth === 0) { jsonEnd = i + 1; break; }
+      }
+    }
+    if (jsonEnd === -1) throw new Error('Could not parse NPC_DATA structure');
+
+    const dataStr = text.substring(jsonStart, jsonEnd);
+    const data = JSON.parse(dataStr);
+
+    // Append new node + links
+    const { node, newLinks } = collectForm();
+    data.nodes.push(node);
+    newLinks.forEach(l => data.links.push(l));
+
+    // Re-serialize with 2-space indent to match style
+    const newDataStr = JSON.stringify(data, null, 2);
+    const newText = text.substring(0, jsonStart) + newDataStr + text.substring(jsonEnd);
+
+    // Write
+    const writable = await fileHandle.createWritable();
+    await writable.write(newText);
+    await writable.close();
+
+    return { node, newLinks };
+  }
+
+  document.getElementById('gm-save').addEventListener('click', async () => {
+    try {
+      status('Saving…', '');
+      const { node, newLinks } = await writeBackToFile();
+
+      // Optimistically update the in-memory NPC_DATA so the page reflects
+      // the change without a reload, and refresh the datalist.
+      NPC_DATA.nodes.push(node);
+      newLinks.forEach(l => NPC_DATA.links.push(l));
+      const opt = document.createElement('option');
+      opt.value = node.id;
+      datalist.appendChild(opt);
+
+      status(`Saved "${node.id}" — reload to see them in the web`, 'success');
+    } catch (err) {
+      console.error(err);
+      status(err.message || String(err), 'error');
+    }
+  });
+
+  // Detect lack of File System Access API and disable the save button gracefully
+  if (!window.showOpenFilePicker) {
+    const saveBtn = document.getElementById('gm-save');
+    saveBtn.disabled = true;
+    saveBtn.title = 'Requires Chrome or Edge';
+    saveBtn.textContent = 'Save to file (Chrome/Edge only)';
+  }
+})();
 </script>
 </body>
 </html>
