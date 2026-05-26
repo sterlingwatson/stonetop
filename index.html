@@ -355,13 +355,6 @@
 <svg id="graph"></svg>
 
 <div id="loading">drawing the web…</div>
-<div id="error">
-  <div class="box">
-    <h2>The threads could not be gathered</h2>
-    <p>The file <code>npcs.json</code> could not be loaded. If you are viewing this by double-clicking the HTML file, your browser may be blocking the JSON fetch. Serve the folder with a local web server instead — for example, run <code>python3 -m http.server</code> in this folder and visit <code>http://localhost:8000</code>.</p>
-    <p style="font-size:13px; opacity:0.7;" id="error-detail"></p>
-  </div>
-</div>
 
 <div id="detail">
   <button class="close" aria-label="close">✕</button>
@@ -375,7 +368,7 @@
   <ul class="rel-list" id="d-rels"></ul>
 </div>
 
-<div id="footer-hint">edit <code style="font-family:inherit; background:rgba(0,0,0,0.05); padding:1px 4px;">npcs.json</code> to add NPCs, portraits, and bonds</div>
+<div id="footer-hint">edit the <code style="font-family:inherit; background:rgba(0,0,0,0.05); padding:1px 4px;">NPC_DATA</code> block inside this file to add NPCs and bonds</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 <script>
@@ -396,20 +389,678 @@ const edgeStyle = {
 };
 
 // ============================================================
-// LOAD DATA FROM JSON
+// NPC DATA — inline so the page works inside iframes (e.g. Miro)
+// without needing a separate JSON fetch. To edit NPCs and bonds,
+// modify the object below directly.
 // ============================================================
-fetch('npcs.json')
-  .then(r => {
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    return r.json();
-  })
-  .then(data => buildGraph(data))
-  .catch(err => {
-    console.error(err);
-    document.getElementById('loading').classList.add('hidden');
-    document.getElementById('error').classList.add('shown');
-    document.getElementById('error-detail').textContent = String(err);
-  });
+const NPC_DATA = {
+  "nodes": [
+    {
+      "id": "Wynn",
+      "group": "wynn",
+      "pc": true,
+      "age": 25,
+      "pronouns": "any",
+      "loc": "Stonetop",
+      "size": 22,
+      "portrait": "",
+      "body": "Curious, flirtatious. Stole a runed book from old Afon. Has three would-be suitors she has no interest in."
+    },
+    {
+      "id": "Sorsha",
+      "group": "sorsha",
+      "pc": true,
+      "age": 24,
+      "pronouns": "he/they",
+      "loc": "Marshedge",
+      "size": 22,
+      "portrait": "",
+      "body": "Light-bearer. Burned all over from the fire that killed his family. Said to be the reincarnation of Zara. Pilgrim to Helior's pavilion in the Flats."
+    },
+    {
+      "id": "Big Limmy",
+      "group": "lim",
+      "pc": true,
+      "age": 48,
+      "pronouns": "he/him",
+      "loc": "Marshedge",
+      "size": 22,
+      "portrait": "",
+      "body": "Hard-worn. Storm-runes mark him from the lightning strike eight years past. Was a beggar and thief before the mines of Gordan's Delve. Distills the finest whiskey in Stonetop."
+    },
+    {
+      "id": "Anxo Saber",
+      "group": "anxo",
+      "pc": true,
+      "age": 18,
+      "pronouns": "he/him",
+      "loc": "Steplands",
+      "size": 22,
+      "portrait": "",
+      "body": "Short, soft-handed, gloved at all times. Cannot ride a horse. Bears strange arcane scars. Apprenticed to the Apothecary."
+    },
+    {
+      "id": "Elin",
+      "group": "wynn",
+      "age": 32,
+      "pronouns": "she/her",
+      "loc": "Stonetop",
+      "size": 12,
+      "portrait": "",
+      "body": "Wynn's aunt, seven years her senior. Close to Wynn."
+    },
+    {
+      "id": "Brynmor",
+      "group": "wynn",
+      "age": 33,
+      "pronouns": "he/him",
+      "loc": "Stonetop",
+      "size": 11,
+      "portrait": "",
+      "body": "Elin's husband. Does not much like Wynn."
+    },
+    {
+      "id": "Reece",
+      "group": "wynn",
+      "age": 7,
+      "pronouns": "he/him",
+      "loc": "Stonetop",
+      "size": 8,
+      "portrait": "",
+      "body": "Elin and Brynmor's eldest."
+    },
+    {
+      "id": "Parry",
+      "group": "wynn",
+      "age": 5,
+      "pronouns": "he/him",
+      "loc": "Stonetop",
+      "size": 8,
+      "portrait": "",
+      "body": "Elin and Brynmor's youngest."
+    },
+    {
+      "id": "Bran",
+      "group": "wynn",
+      "age": 51,
+      "pronouns": "he/him",
+      "loc": "Stonetop",
+      "size": 12,
+      "portrait": "",
+      "body": "Wynn's father. Decent relationship."
+    },
+    {
+      "id": "Mair",
+      "group": "wynn",
+      "age": 48,
+      "pronouns": "she/her",
+      "loc": "Stonetop",
+      "size": 12,
+      "portrait": "",
+      "body": "Wynn's mother. Decent relationship."
+    },
+    {
+      "id": "Winifred",
+      "group": "wynn",
+      "age": 0,
+      "pronouns": "she/her",
+      "loc": "Stonetop",
+      "size": 9,
+      "portrait": "",
+      "body": "Wynn's younger sister. A tattletale, especially when slighted."
+    },
+    {
+      "id": "Afon",
+      "group": "wynn",
+      "age": 72,
+      "pronouns": "he/him",
+      "loc": "Stonetop",
+      "size": 12,
+      "portrait": "",
+      "body": "The crazy old man. Wynn stole a book of glowing runes from him."
+    },
+    {
+      "id": "Parvis",
+      "group": "wynn",
+      "age": 0,
+      "pronouns": "he/him",
+      "loc": "Lygos",
+      "size": 11,
+      "portrait": "",
+      "body": "Handsome, dark-haired. From Lygos. Thinks Wynn loves him."
+    },
+    {
+      "id": "Alun",
+      "group": "wynn",
+      "age": 0,
+      "pronouns": "he/him",
+      "loc": "Stonetop",
+      "size": 11,
+      "portrait": "",
+      "body": "Local lad, grew up alongside Wynn. Has always had a crush."
+    },
+    {
+      "id": "Emrys",
+      "group": "wynn",
+      "age": 0,
+      "pronouns": "she/her",
+      "loc": "Stonetop",
+      "size": 11,
+      "portrait": "",
+      "body": "Comely ginger lass with a fiery temper. Youngest of Wynn's three suitors."
+    },
+    {
+      "id": "Yorath",
+      "group": "sorsha",
+      "age": 12,
+      "pronouns": "she/her",
+      "loc": "Stonetop",
+      "size": 10,
+      "portrait": "",
+      "body": "A kind, sweethearted child. Dear to Sorsha."
+    },
+    {
+      "id": "Tomos",
+      "group": "sorsha",
+      "age": 33,
+      "pronouns": "he/him",
+      "loc": "Stonetop",
+      "size": 12,
+      "portrait": "",
+      "body": "Hunter. Yorath's father. Took Sorsha in."
+    },
+    {
+      "id": "Nia",
+      "group": "sorsha",
+      "age": 31,
+      "pronouns": "she/her",
+      "loc": "Stonetop",
+      "size": 12,
+      "portrait": "",
+      "body": "Midwife. Yorath's mother. Took Sorsha in."
+    },
+    {
+      "id": "Bronwin",
+      "group": "sorsha",
+      "age": 86,
+      "pronouns": "he/him",
+      "loc": "Stonetop",
+      "size": 13,
+      "portrait": "",
+      "body": "Still farms his garden plot despite Sorsha's pleas to rest. Widower of Cadi the Elder (d. 8 yrs past). Three 'good-for-nothing' unmarried sons. Now keeping company with Gwenda."
+    },
+    {
+      "id": "Deiniol",
+      "group": "sorsha",
+      "age": 40,
+      "pronouns": "he/him",
+      "loc": "Stonetop",
+      "size": 10,
+      "portrait": "",
+      "body": "Bronwin's son. Unmarried, 'good-for-nothing.'"
+    },
+    {
+      "id": "Dilwen",
+      "group": "sorsha",
+      "age": 42,
+      "pronouns": "he/him",
+      "loc": "Stonetop",
+      "size": 10,
+      "portrait": "",
+      "body": "Bronwin's son. Unmarried, 'good-for-nothing.'"
+    },
+    {
+      "id": "Dylis",
+      "group": "sorsha",
+      "age": 44,
+      "pronouns": "he/him",
+      "loc": "Stonetop",
+      "size": 10,
+      "portrait": "",
+      "body": "Bronwin's son. Unmarried, 'good-for-nothing.'"
+    },
+    {
+      "id": "Lim (the younger)",
+      "group": "lim",
+      "age": 27,
+      "pronouns": "he/him",
+      "loc": "Stonetop",
+      "size": 12,
+      "portrait": "",
+      "body": "Snot-nosed native Stonetopper. Distills whiskey. Galled that an outsider, Big Limmy, makes finer drink than he does."
+    },
+    {
+      "id": "Marged",
+      "group": "lim",
+      "age": 0,
+      "pronouns": "she/her",
+      "loc": "the Fen",
+      "size": 12,
+      "portrait": "",
+      "body": "Bootlegger and native Stonetopper. Taught Big Limmy to distill. Made a life in the Fen after a failed marriage to Rheinhal. Looked after Limmy."
+    },
+    {
+      "id": "Rheinhal",
+      "group": "lim",
+      "age": 68,
+      "pronouns": "they/them",
+      "loc": "Stonetop",
+      "size": 11,
+      "portrait": "",
+      "body": "Once married to Marged. The marriage failed. Does not know what Limmy knows."
+    },
+    {
+      "id": "Soinad",
+      "group": "lim",
+      "age": 50,
+      "pronouns": "she/her",
+      "loc": "Stonetop",
+      "size": 13,
+      "portrait": "",
+      "body": "The publican. Tender, heartfelt dalliance with Big Limmy. Lost her husband to an auroch hunt twelve years ago — still bitter, still blames Cadmor."
+    },
+    {
+      "id": "Cadmor",
+      "group": "lim",
+      "age": 36,
+      "pronouns": "he/him",
+      "loc": "Stonetop",
+      "size": 11,
+      "portrait": "",
+      "body": "Hunter. Led the auroch hunt twelve years ago in which Soinad's husband was killed."
+    },
+    {
+      "id": "Dai",
+      "group": "bridge",
+      "age": 25,
+      "pronouns": "she/her",
+      "loc": "Stonetop",
+      "size": 11,
+      "portrait": "",
+      "body": "Soinad's eldest. Close friend of Wynn. Lim likes her but doesn't know how to relate."
+    },
+    {
+      "id": "Haf",
+      "group": "lim",
+      "age": 20,
+      "pronouns": "he/him",
+      "loc": "Stonetop",
+      "size": 9,
+      "portrait": "",
+      "body": "Soinad's middle child."
+    },
+    {
+      "id": "Mirgen",
+      "group": "lim",
+      "age": 17,
+      "pronouns": "she/they",
+      "loc": "Stonetop",
+      "size": 9,
+      "portrait": "",
+      "body": "Soinad's youngest."
+    },
+    {
+      "id": "Taliesyn",
+      "group": "lim",
+      "age": 40,
+      "pronouns": "they/them",
+      "loc": "Stonetop",
+      "size": 12,
+      "portrait": "",
+      "body": "Ranger. Limps with a cane since Big Limmy broke their knee in a bar fight eight years past. Limmy strives still to earn their forgiveness."
+    },
+    {
+      "id": "Anx",
+      "group": "anxo",
+      "age": 0,
+      "pronouns": "he/him",
+      "loc": "Steplands",
+      "size": 11,
+      "portrait": "",
+      "body": "Anxo's father. Nomadic farmer of fast-growing vegetables. Sent his son to Stonetop knowing he'd not survive the steppe life."
+    },
+    {
+      "id": "Persefoni",
+      "group": "anxo",
+      "age": 39,
+      "pronouns": "she/they",
+      "loc": "Lygos",
+      "size": 12,
+      "portrait": "",
+      "body": "Wise woman of Lygos. Taught Anxo to read and write Lygosi. Won Norubu's Ice Sphere from him in a gamble of his father's belongings."
+    },
+    {
+      "id": "Eilwena",
+      "group": "anxo",
+      "age": 62,
+      "pronouns": "she/her",
+      "loc": "Stonetop",
+      "size": 11,
+      "portrait": "",
+      "body": "A hermit, often seen sifting the midden at the edge of town. Anxo watches over her secretly."
+    },
+    {
+      "id": "Gwenda",
+      "group": "bridge",
+      "age": 85,
+      "pronouns": "she/her",
+      "loc": "Stonetop",
+      "size": 14,
+      "portrait": "",
+      "body": "The Apothecary. Close to Sorsha. Mentor and housemate to Anxo. Keeps a dog named Cadi. Has lately taken up with old Bronwin."
+    },
+    {
+      "id": "Cadi (the dog)",
+      "group": "bridge",
+      "age": 0,
+      "pronouns": "—",
+      "loc": "Stonetop",
+      "size": 9,
+      "portrait": "",
+      "body": "Gwenda's dog. Anxo trusts this dog more than he trusts himself. Shares a name with Bronwin's late wife — Cadi the Elder."
+    }
+  ],
+  "links": [
+    {
+      "source": "Wynn",
+      "target": "Elin",
+      "type": "kin",
+      "label": "aunt; close"
+    },
+    {
+      "source": "Elin",
+      "target": "Brynmor",
+      "type": "kin",
+      "label": "married"
+    },
+    {
+      "source": "Brynmor",
+      "target": "Wynn",
+      "type": "grudge",
+      "label": "dislikes",
+      "directed": true
+    },
+    {
+      "source": "Elin",
+      "target": "Reece",
+      "type": "kin",
+      "label": "mother"
+    },
+    {
+      "source": "Elin",
+      "target": "Parry",
+      "type": "kin",
+      "label": "mother"
+    },
+    {
+      "source": "Brynmor",
+      "target": "Reece",
+      "type": "kin",
+      "label": "father"
+    },
+    {
+      "source": "Brynmor",
+      "target": "Parry",
+      "type": "kin",
+      "label": "father"
+    },
+    {
+      "source": "Wynn",
+      "target": "Bran",
+      "type": "kin",
+      "label": "father"
+    },
+    {
+      "source": "Wynn",
+      "target": "Mair",
+      "type": "kin",
+      "label": "mother"
+    },
+    {
+      "source": "Bran",
+      "target": "Mair",
+      "type": "kin",
+      "label": "married"
+    },
+    {
+      "source": "Wynn",
+      "target": "Winifred",
+      "type": "kin",
+      "label": "younger sister; tattletale"
+    },
+    {
+      "source": "Wynn",
+      "target": "Afon",
+      "type": "grudge",
+      "label": "stole a runed book",
+      "directed": true
+    },
+    {
+      "source": "Parvis",
+      "target": "Wynn",
+      "type": "romance",
+      "label": "thinks himself loved",
+      "directed": true
+    },
+    {
+      "source": "Alun",
+      "target": "Wynn",
+      "type": "romance",
+      "label": "lifelong crush",
+      "directed": true
+    },
+    {
+      "source": "Emrys",
+      "target": "Wynn",
+      "type": "romance",
+      "label": "fierce attachment",
+      "directed": true
+    },
+    {
+      "source": "Sorsha",
+      "target": "Yorath",
+      "type": "friend",
+      "label": "dear child"
+    },
+    {
+      "source": "Yorath",
+      "target": "Tomos",
+      "type": "kin",
+      "label": "father"
+    },
+    {
+      "source": "Yorath",
+      "target": "Nia",
+      "type": "kin",
+      "label": "mother"
+    },
+    {
+      "source": "Tomos",
+      "target": "Nia",
+      "type": "kin",
+      "label": "married"
+    },
+    {
+      "source": "Sorsha",
+      "target": "Tomos",
+      "type": "friend",
+      "label": "taken in by"
+    },
+    {
+      "source": "Sorsha",
+      "target": "Nia",
+      "type": "friend",
+      "label": "taken in by"
+    },
+    {
+      "source": "Sorsha",
+      "target": "Bronwin",
+      "type": "friend",
+      "label": "fond elder"
+    },
+    {
+      "source": "Bronwin",
+      "target": "Deiniol",
+      "type": "kin",
+      "label": "son"
+    },
+    {
+      "source": "Bronwin",
+      "target": "Dilwen",
+      "type": "kin",
+      "label": "son"
+    },
+    {
+      "source": "Bronwin",
+      "target": "Dylis",
+      "type": "kin",
+      "label": "son"
+    },
+    {
+      "source": "Sorsha",
+      "target": "Gwenda",
+      "type": "friend",
+      "label": "fond elder"
+    },
+    {
+      "source": "Bronwin",
+      "target": "Gwenda",
+      "type": "romance",
+      "label": "late-blooming bond"
+    },
+    {
+      "source": "Big Limmy",
+      "target": "Lim (the younger)",
+      "type": "grudge",
+      "label": "whiskey rivalry"
+    },
+    {
+      "source": "Big Limmy",
+      "target": "Marged",
+      "type": "mentor",
+      "label": "taught him to distill",
+      "directed": true
+    },
+    {
+      "source": "Marged",
+      "target": "Rheinhal",
+      "type": "kin",
+      "label": "failed marriage"
+    },
+    {
+      "source": "Big Limmy",
+      "target": "Rheinhal",
+      "type": "secret",
+      "label": "knows of Marged",
+      "directed": true
+    },
+    {
+      "source": "Big Limmy",
+      "target": "Soinad",
+      "type": "romance",
+      "label": "tender, heartfelt"
+    },
+    {
+      "source": "Soinad",
+      "target": "Cadmor",
+      "type": "grudge",
+      "label": "blames for husband's death",
+      "directed": true
+    },
+    {
+      "source": "Soinad",
+      "target": "Dai",
+      "type": "kin",
+      "label": "mother"
+    },
+    {
+      "source": "Soinad",
+      "target": "Haf",
+      "type": "kin",
+      "label": "mother"
+    },
+    {
+      "source": "Soinad",
+      "target": "Mirgen",
+      "type": "kin",
+      "label": "mother"
+    },
+    {
+      "source": "Big Limmy",
+      "target": "Taliesyn",
+      "type": "grudge",
+      "label": "broke their knee; seeks forgiveness",
+      "directed": true
+    },
+    {
+      "source": "Wynn",
+      "target": "Dai",
+      "type": "friend",
+      "label": "close friends"
+    },
+    {
+      "source": "Anxo Saber",
+      "target": "Anx",
+      "type": "kin",
+      "label": "father"
+    },
+    {
+      "source": "Anxo Saber",
+      "target": "Persefoni",
+      "type": "mentor",
+      "label": "taught him letters",
+      "directed": true
+    },
+    {
+      "source": "Persefoni",
+      "target": "Anxo Saber",
+      "type": "grudge",
+      "label": "won Ice Sphere by gambling",
+      "directed": true
+    },
+    {
+      "source": "Anxo Saber",
+      "target": "Gwenda",
+      "type": "mentor",
+      "label": "apprenticed to",
+      "directed": true
+    },
+    {
+      "source": "Anxo Saber",
+      "target": "Eilwena",
+      "type": "secret",
+      "label": "watches over in secret",
+      "directed": true
+    },
+    {
+      "source": "Anxo Saber",
+      "target": "Cadi (the dog)",
+      "type": "friend",
+      "label": "trusts more than himself"
+    },
+    {
+      "source": "Gwenda",
+      "target": "Cadi (the dog)",
+      "type": "kin",
+      "label": "her dog"
+    },
+    {
+      "source": "Anxo Saber",
+      "target": "Big Limmy",
+      "type": "friend",
+      "label": "asks about life"
+    },
+    {
+      "source": "Anxo Saber",
+      "target": "Wynn",
+      "type": "friend",
+      "label": "friendly; she watches the newcomer"
+    }
+  ]
+};
+
+// Build the graph from the inline data
+buildGraph(NPC_DATA);
 
 function buildGraph(data) {
   const nodes = data.nodes;
