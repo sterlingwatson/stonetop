@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Stonetop — NPC Web</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IM+Fell+English+SC&family=IM+Fell+English:ital@0;1&display=swap');
+
+  :root {
+    --parchment: #ede0c4;
+    --parchment-dark: #d9c8a1;
+    --ink: #2a1f10;
+    --ink-soft: #4a3820;
+    --rust: #8a3324;
+    --moss: #4a5a2a;
+    --slate: #3a4858;
+    --gold: #a87b2a;
+    --bone: #f4ead2;
+
+    --c-wynn: #6b3e2e;
+    --c-sorsha: #b8651f;
+    --c-lim: #2f5566;
+    --c-anxo: #5a4a7a;
+    --c-bridge: #7a5b2a;
+    --c-pc-glow: #d4a838;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+  body {
+    font-family: 'Cormorant Garamond', serif;
+    color: var(--ink);
+    background:
+      radial-gradient(ellipse at 20% 10%, rgba(168, 123, 42, 0.18), transparent 50%),
+      radial-gradient(ellipse at 80% 90%, rgba(74, 56, 32, 0.22), transparent 55%),
+      radial-gradient(ellipse at 50% 50%, var(--parchment) 0%, var(--parchment-dark) 100%);
+    background-color: var(--parchment);
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    pointer-events: none;
+    background-image:
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence baseFrequency='0.9' numOctaves='2' seed='4'/><feColorMatrix values='0 0 0 0 0.15  0 0 0 0 0.1  0 0 0 0 0.05  0 0 0 0.12 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    opacity: 0.55;
+    mix-blend-mode: multiply;
+    z-index: 1;
+  }
+
+  #header {
+    position: fixed; top: 0; left: 0; right: 0;
+    padding: 14px 28px 12px;
+    z-index: 10;
+    display: flex; align-items: baseline; justify-content: space-between;
+    border-bottom: 1px solid rgba(74, 56, 32, 0.25);
+    background: linear-gradient(to bottom, rgba(237, 224, 196, 0.95), rgba(237, 224, 196, 0.6) 70%, transparent);
+    backdrop-filter: blur(2px);
+  }
+  #header h1 {
+    font-family: 'IM Fell English SC', serif;
+    font-weight: 400;
+    font-size: 26px;
+    letter-spacing: 0.08em;
+    margin: 0;
+    color: var(--ink);
+  }
+  #header h1 .ornament {
+    color: var(--rust);
+    margin: 0 12px;
+    font-style: italic;
+  }
+  #header .subtitle {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--ink-soft);
+    letter-spacing: 0.04em;
+  }
+
+  #controls {
+    position: fixed; top: 64px; left: 16px;
+    z-index: 9;
+    background: rgba(244, 234, 210, 0.92);
+    border: 1px solid rgba(74, 56, 32, 0.35);
+    padding: 12px 14px 10px;
+    box-shadow: 2px 3px 0 rgba(42, 31, 16, 0.12);
+    max-width: 230px;
+  }
+  #controls h3 {
+    font-family: 'IM Fell English SC', serif;
+    font-weight: 400;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    margin: 0 0 8px;
+    color: var(--ink-soft);
+    border-bottom: 1px dashed rgba(74, 56, 32, 0.3);
+    padding-bottom: 4px;
+  }
+  .filter-row {
+    display: flex; align-items: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    margin: 3px 0;
+    cursor: pointer;
+    user-select: none;
+  }
+  .filter-row input { margin-right: 8px; cursor: pointer; }
+  .swatch {
+    display: inline-block;
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    margin-right: 6px;
+    border: 1px solid rgba(0,0,0,0.25);
+  }
+  .edge-key {
+    display: flex; align-items: center;
+    font-size: 14px;
+    margin: 4px 0;
+    color: var(--ink-soft);
+  }
+  .edge-key svg {
+    flex-shrink: 0;
+    margin-right: 8px;
+    display: block;
+  }
+
+  #graph {
+    position: fixed; inset: 0;
+    z-index: 2;
+  }
+
+  #loading {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 20;
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 18px;
+    color: var(--ink-soft);
+    pointer-events: none;
+    transition: opacity 0.4s;
+  }
+  #loading.hidden { opacity: 0; }
+  #error {
+    position: fixed; inset: 0;
+    display: none; align-items: center; justify-content: center;
+    z-index: 21;
+    background: rgba(237, 224, 196, 0.95);
+    font-family: 'IM Fell English', serif;
+    text-align: center;
+    padding: 40px;
+  }
+  #error.shown { display: flex; }
+  #error .box {
+    max-width: 600px;
+    border: 1px solid var(--rust);
+    padding: 24px 30px;
+    background: var(--bone);
+  }
+  #error h2 {
+    font-family: 'IM Fell English SC', serif;
+    font-size: 22px;
+    color: var(--rust);
+    margin: 0 0 12px;
+  }
+  #error code {
+    background: rgba(74,56,32,0.08);
+    padding: 2px 6px;
+    font-size: 14px;
+  }
+
+  #detail {
+    position: fixed;
+    right: -380px;
+    top: 60px; bottom: 16px;
+    width: 360px;
+    background: var(--bone);
+    border: 1px solid rgba(74, 56, 32, 0.4);
+    box-shadow: -4px 0 12px rgba(42, 31, 16, 0.15);
+    padding: 22px 24px;
+    overflow-y: auto;
+    transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 11;
+  }
+  #detail.open { right: 16px; }
+  #detail::before {
+    content: '';
+    position: absolute; inset: 6px;
+    border: 1px solid rgba(168, 123, 42, 0.3);
+    pointer-events: none;
+  }
+  #detail .close {
+    position: absolute; top: 10px; right: 14px;
+    cursor: pointer; font-family: 'IM Fell English', serif;
+    font-size: 22px; color: var(--ink-soft);
+    background: none; border: none;
+  }
+  #detail .close:hover { color: var(--rust); }
+
+  #detail .portrait {
+    width: 110px; height: 110px;
+    margin: 4px auto 12px;
+    border-radius: 50%;
+    border: 2px solid var(--gold);
+    background: var(--parchment-dark);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'IM Fell English SC', serif;
+    font-size: 38px;
+    color: var(--ink-soft);
+    box-shadow: 0 0 0 4px var(--bone), 0 0 0 5px rgba(74,56,32,0.3);
+    overflow: hidden;
+  }
+  #detail .portrait img { width: 100%; height: 100%; object-fit: cover; }
+
+  #detail h2 {
+    font-family: 'IM Fell English SC', serif;
+    font-weight: 400;
+    font-size: 24px;
+    text-align: center;
+    margin: 0 0 2px;
+    letter-spacing: 0.04em;
+  }
+  #detail .meta {
+    text-align: center;
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 15px;
+    margin-bottom: 14px;
+  }
+  #detail .divider {
+    text-align: center;
+    color: var(--rust);
+    margin: 12px 0 10px;
+    font-size: 18px;
+    letter-spacing: 0.4em;
+  }
+  #detail .section-label {
+    font-family: 'IM Fell English SC', serif;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    color: var(--ink-soft);
+    margin: 14px 0 4px;
+  }
+  #detail .body-text {
+    font-size: 16px;
+    line-height: 1.45;
+  }
+  #detail .rel-list { padding: 0; margin: 0; list-style: none; }
+  #detail .rel-list li {
+    padding: 4px 0;
+    border-bottom: 1px dotted rgba(74,56,32,0.2);
+    font-size: 15px;
+    cursor: pointer;
+  }
+  #detail .rel-list li:hover { color: var(--rust); }
+  #detail .rel-type {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 13px;
+    margin-right: 6px;
+  }
+
+  .node circle {
+    stroke: var(--ink);
+    stroke-width: 1.5px;
+    cursor: pointer;
+    transition: stroke-width 0.15s, filter 0.15s;
+  }
+  .node.pc circle {
+    stroke: var(--c-pc-glow);
+    stroke-width: 3px;
+    filter: drop-shadow(0 0 6px rgba(212, 168, 56, 0.55));
+  }
+  .node:hover circle {
+    stroke-width: 3.5px;
+    filter: drop-shadow(0 0 4px rgba(0,0,0,0.4));
+  }
+  .node text {
+    font-family: 'IM Fell English', serif;
+    font-size: 12px;
+    fill: var(--ink);
+    pointer-events: none;
+    text-anchor: middle;
+    paint-order: stroke;
+    stroke: rgba(244, 234, 210, 0.85);
+    stroke-width: 3px;
+    stroke-linejoin: round;
+  }
+  .node.pc text {
+    font-family: 'IM Fell English SC', serif;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+  }
+  .node.faded { opacity: 0.18; }
+  .link { fill: none; pointer-events: none; }
+  .link.faded { opacity: 0.08; }
+  .link.invisible { opacity: 0; }
+
+  #footer-hint {
+    position: fixed; bottom: 10px; right: 16px;
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--ink-soft);
+    z-index: 5;
+    opacity: 0.75;
+  }
+</style>
+</head>
+<body>
+
+<div id="header">
+  <h1>The Web of Stonetop <span class="ornament">⚜</span> <span style="font-size:18px; color:var(--ink-soft);">Session Zero</span></h1>
+  <div class="subtitle">click a soul · drag to rearrange · scroll to zoom</div>
+</div>
+
+<div id="controls">
+  <h3>Threads</h3>
+  <label class="filter-row"><input type="checkbox" data-group="wynn" checked><span class="swatch" style="background:var(--c-wynn)"></span>Wynn's circle</label>
+  <label class="filter-row"><input type="checkbox" data-group="sorsha" checked><span class="swatch" style="background:var(--c-sorsha)"></span>Sorsha's circle</label>
+  <label class="filter-row"><input type="checkbox" data-group="lim" checked><span class="swatch" style="background:var(--c-lim)"></span>Lim's circle</label>
+  <label class="filter-row"><input type="checkbox" data-group="anxo" checked><span class="swatch" style="background:var(--c-anxo)"></span>Anxo's circle</label>
+  <label class="filter-row"><input type="checkbox" data-group="bridge" checked><span class="swatch" style="background:var(--c-bridge)"></span>Bridge folk</label>
+
+  <h3 style="margin-top:14px;">Bonds</h3>
+  <div class="edge-key">
+    <svg width="28" height="10" viewBox="0 0 28 10"><line x1="1" y1="5" x2="27" y2="5" stroke="#8a3324" stroke-width="2.2" stroke-linecap="round"/></svg>
+    Kin
+  </div>
+  <div class="edge-key">
+    <svg width="28" height="10" viewBox="0 0 28 10"><line x1="1" y1="5" x2="27" y2="5" stroke="#c44d6d" stroke-width="2.2" stroke-dasharray="5 3" stroke-linecap="round"/></svg>
+    Romance / desire
+  </div>
+  <div class="edge-key">
+    <svg width="28" height="10" viewBox="0 0 28 10"><line x1="1" y1="5" x2="27" y2="5" stroke="#3a4858" stroke-width="2.2" stroke-linecap="round"/></svg>
+    Friendship
+  </div>
+  <div class="edge-key">
+    <svg width="28" height="10" viewBox="0 0 28 10"><line x1="1" y1="5" x2="27" y2="5" stroke="#1a3a4a" stroke-width="2.2" stroke-linecap="round"/></svg>
+    Mentor / apprentice
+  </div>
+  <div class="edge-key">
+    <svg width="28" height="10" viewBox="0 0 28 10"><line x1="1" y1="5" x2="27" y2="5" stroke="#2a1f10" stroke-width="2.2" stroke-dasharray="2 4" stroke-linecap="round"/></svg>
+    Grudge / rivalry
+  </div>
+  <div class="edge-key">
+    <svg width="28" height="10" viewBox="0 0 28 10"><line x1="1" y1="5" x2="27" y2="5" stroke="#a87b2a" stroke-width="2.2" stroke-dasharray="1 3" stroke-linecap="round"/></svg>
+    Secret
+  </div>
+</div>
+
+<svg id="graph"></svg>
+
+<div id="loading">drawing the web…</div>
+<div id="error">
+  <div class="box">
+    <h2>The threads could not be gathered</h2>
+    <p>The file <code>npcs.json</code> could not be loaded. If you are viewing this by double-clicking the HTML file, your browser may be blocking the JSON fetch. Serve the folder with a local web server instead — for example, run <code>python3 -m http.server</code> in this folder and visit <code>http://localhost:8000</code>.</p>
+    <p style="font-size:13px; opacity:0.7;" id="error-detail"></p>
+  </div>
+</div>
+
+<div id="detail">
+  <button class="close" aria-label="close">✕</button>
+  <div class="portrait" id="d-portrait"></div>
+  <h2 id="d-name"></h2>
+  <div class="meta" id="d-meta"></div>
+  <div class="divider">· · ❦ · ·</div>
+  <div class="section-label">Of them it is said</div>
+  <div class="body-text" id="d-body"></div>
+  <div class="section-label" id="d-rel-label">Bonds</div>
+  <ul class="rel-list" id="d-rels"></ul>
+</div>
+
+<div id="footer-hint">edit <code style="font-family:inherit; background:rgba(0,0,0,0.05); padding:1px 4px;">npcs.json</code> to add NPCs, portraits, and bonds</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script>
+// ============================================================
+// CONFIG — visual styling for groups and edge types
+// ============================================================
+const groupColor = {
+  wynn: 'var(--c-wynn)', sorsha: 'var(--c-sorsha)',
+  lim: 'var(--c-lim)', anxo: 'var(--c-anxo)', bridge: 'var(--c-bridge)'
+};
+const edgeStyle = {
+  kin:     { color: '#8a3324', width: 2.0, dash: null },
+  romance: { color: '#c44d6d', width: 1.8, dash: '5 4' },
+  friend:  { color: '#3a4858', width: 1.6, dash: null },
+  mentor:  { color: '#1a3a4a', width: 2.0, dash: null },
+  grudge:  { color: '#2a1f10', width: 1.8, dash: '2 4' },
+  secret:  { color: '#a87b2a', width: 1.6, dash: '1 3' },
+};
+
+// ============================================================
+// LOAD DATA FROM JSON
+// ============================================================
+fetch('npcs.json')
+  .then(r => {
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  })
+  .then(data => buildGraph(data))
+  .catch(err => {
+    console.error(err);
+    document.getElementById('loading').classList.add('hidden');
+    document.getElementById('error').classList.add('shown');
+    document.getElementById('error-detail').textContent = String(err);
+  });
+
+function buildGraph(data) {
+  const nodes = data.nodes;
+  const links = data.links.slice();
+
+  // ----------------------------------------------------------
+  // Add invisible PC-binding edges so the four PC webs cluster
+  // together visually instead of drifting apart.
+  // ----------------------------------------------------------
+  const pcs = nodes.filter(n => n.pc);
+  for (let i = 0; i < pcs.length; i++) {
+    for (let j = i + 1; j < pcs.length; j++) {
+      links.push({
+        source: pcs[i].id,
+        target: pcs[j].id,
+        type: 'bind',
+        _bind: true
+      });
+    }
+  }
+
+  document.getElementById('loading').classList.add('hidden');
+
+  const svg = d3.select('#graph');
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+  svg.attr('viewBox', [0, 0, width, height]);
+
+  // Arrowhead defs for directed edges
+  const defs = svg.append('defs');
+  Object.entries(edgeStyle).forEach(([key, s]) => {
+    defs.append('marker')
+      .attr('id', `arrow-${key}`)
+      .attr('viewBox', '0 -5 10 10')
+      .attr('refX', 18).attr('refY', 0)
+      .attr('markerWidth', 6).attr('markerHeight', 6)
+      .attr('orient', 'auto')
+      .append('path').attr('d', 'M0,-4L10,0L0,4').attr('fill', s.color);
+  });
+
+  const zoomG = svg.append('g');
+  svg.call(d3.zoom().scaleExtent([0.3, 3]).on('zoom', (e) => zoomG.attr('transform', e.transform)));
+
+  const linkG = zoomG.append('g').attr('class', 'links');
+  const nodeG = zoomG.append('g').attr('class', 'nodes');
+
+  const sim = d3.forceSimulation(nodes)
+    .force('link', d3.forceLink(links).id(d => d.id)
+      .distance(d => {
+        if (d._bind) return 220;          // PCs settle near, but not overlapping
+        if (d.type === 'kin') return 70;
+        return 95;
+      })
+      .strength(d => {
+        if (d._bind) return 0.18;          // gentle constant tug between PCs
+        if (d.type === 'kin') return 0.85;
+        return 0.7;
+      }))
+    .force('charge', d3.forceManyBody().strength(-380))
+    .force('center', d3.forceCenter(width / 2, height / 2))
+    .force('collide', d3.forceCollide().radius(d => d.size + 14));
+
+  const link = linkG.selectAll('path')
+    .data(links)
+    .enter().append('path')
+    .attr('class', d => 'link' + (d._bind ? ' invisible' : ''))
+    .attr('stroke', d => d._bind ? 'none' : edgeStyle[d.type].color)
+    .attr('stroke-width', d => d._bind ? 0 : edgeStyle[d.type].width)
+    .attr('stroke-dasharray', d => d._bind ? null : edgeStyle[d.type].dash)
+    .attr('opacity', d => d._bind ? 0 : 0.75)
+    .attr('marker-end', d => (d.directed && !d._bind) ? `url(#arrow-${d.type})` : null);
+
+  const node = nodeG.selectAll('g')
+    .data(nodes)
+    .enter().append('g')
+    .attr('class', d => 'node' + (d.pc ? ' pc' : ''))
+    .call(d3.drag()
+      .on('start', (e, d) => { if (!e.active) sim.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
+      .on('drag',  (e, d) => { d.fx = e.x; d.fy = e.y; })
+      .on('end',   (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx = null; d.fy = null; }))
+    .on('click', (e, d) => openDetail(d, nodes, links));
+
+  node.append('circle')
+    .attr('r', d => d.size)
+    .attr('fill', d => groupColor[d.group]);
+
+  node.filter(d => d.portrait).append('clipPath')
+    .attr('id', d => `clip-${cssId(d.id)}`)
+    .append('circle').attr('r', d => d.size - 2);
+  node.filter(d => d.portrait).append('image')
+    .attr('href', d => d.portrait)
+    .attr('x', d => -d.size + 2).attr('y', d => -d.size + 2)
+    .attr('width', d => (d.size - 2) * 2).attr('height', d => (d.size - 2) * 2)
+    .attr('clip-path', d => `url(#clip-${cssId(d.id)})`)
+    .attr('preserveAspectRatio', 'xMidYMid slice');
+
+  node.append('text')
+    .attr('y', d => d.size + 13)
+    .text(d => d.id);
+
+  sim.on('tick', () => {
+    link.attr('d', d => `M${d.source.x},${d.source.y}L${d.target.x},${d.target.y}`);
+    node.attr('transform', d => `translate(${d.x},${d.y})`);
+  });
+
+  // Filters
+  document.querySelectorAll('#controls input[type=checkbox]').forEach(cb => {
+    cb.addEventListener('change', () => applyFilters(node, link));
+  });
+
+  // Resize
+  window.addEventListener('resize', () => {
+    svg.attr('viewBox', [0, 0, window.innerWidth, window.innerHeight]);
+    sim.force('center', d3.forceCenter(window.innerWidth / 2, window.innerHeight / 2));
+    sim.alpha(0.3).restart();
+  });
+}
+
+function cssId(s) { return s.replace(/[^a-z0-9]/gi, '_'); }
+
+function applyFilters(node, link) {
+  const active = new Set();
+  document.querySelectorAll('#controls input[type=checkbox]:checked').forEach(cb => active.add(cb.dataset.group));
+  node.classed('faded', d => !active.has(d.group) && !d.pc);
+  link.classed('faded', d => {
+    if (d._bind) return false;
+    const sOK = active.has(d.source.group) || d.source.pc;
+    const tOK = active.has(d.target.group) || d.target.pc;
+    return !(sOK && tOK);
+  });
+}
+
+// Detail panel
+const detail = document.getElementById('detail');
+document.querySelector('#detail .close').addEventListener('click', () => detail.classList.remove('open'));
+
+function openDetail(d, allNodes, allLinks) {
+  document.getElementById('d-name').textContent = d.id;
+  const ageStr = d.age ? `age ${d.age}` : '';
+  const pcStr = d.pc ? '— player character' : '';
+  document.getElementById('d-meta').textContent = [d.pronouns, ageStr, d.loc, pcStr].filter(Boolean).join(' · ');
+  document.getElementById('d-body').textContent = d.body;
+
+  const portraitEl = document.getElementById('d-portrait');
+  portraitEl.innerHTML = '';
+  if (d.portrait) {
+    const img = document.createElement('img');
+    img.src = d.portrait;
+    portraitEl.appendChild(img);
+  } else {
+    portraitEl.textContent = d.id.charAt(0);
+  }
+
+  const rels = allLinks.filter(l => !l._bind && (l.source.id === d.id || l.target.id === d.id));
+  const relsEl = document.getElementById('d-rels');
+  relsEl.innerHTML = '';
+  rels.forEach(l => {
+    const li = document.createElement('li');
+    const otherId = l.source.id === d.id ? l.target.id : l.source.id;
+    li.innerHTML = `<span class="rel-type">${l.type}</span><strong>${otherId}</strong> — ${l.label || ''}`;
+    li.addEventListener('click', () => {
+      const other = allNodes.find(n => n.id === otherId);
+      if (other) openDetail(other, allNodes, allLinks);
+    });
+    relsEl.appendChild(li);
+  });
+  document.getElementById('d-rel-label').textContent = rels.length ? 'Bonds' : 'No recorded bonds';
+  detail.classList.add('open');
+}
+</script>
+</body>
+</html>
