@@ -788,7 +788,7 @@ const NPC_DATA = {
     },
     {
       "id": "Parvis",
-      "group": "farmer",
+      "group": "homemaker",
       "age": 0,
       "pronouns": "he/him",
       "loc": "Lygos",
@@ -937,7 +937,7 @@ const NPC_DATA = {
       "body": "Hunter. Led the auroch hunt twelve years ago in which Soinad's husband was killed."
     },
     {
-      "id": "dia",
+      "id": "Dai",
       "group": "other",
       "age": 25,
       "pronouns": "she/her",
@@ -1025,6 +1025,56 @@ const NPC_DATA = {
       "size": 9,
       "portrait": "",
       "body": "Gwenda's dog. Anxo trusts this dog more than he trusts himself. Shares a name with Bronwin's late wife — Cadi the Elder."
+    },
+    {
+      "id": "Owain",
+      "group": "child",
+      "age": 11,
+      "pronouns": "he/him",
+      "loc": "Stonetop",
+      "size": 11,
+      "portrait": "",
+      "body": "Second youngest brother of Wynn"
+    },
+    {
+      "id": "Garet",
+      "group": "farmer",
+      "age": 15,
+      "pronouns": "he/him",
+      "loc": "Stonetop",
+      "size": 11,
+      "portrait": "",
+      "body": "Wynn's brother middle child just now starting to working the fields."
+    },
+    {
+      "id": "Awstin",
+      "group": "farmer",
+      "age": 19,
+      "pronouns": "he/him",
+      "loc": "Stonetop",
+      "size": 11,
+      "portrait": "",
+      "body": "Brother to Wynn"
+    },
+    {
+      "id": "Cadi (the younger)",
+      "group": "homemaker",
+      "age": 27,
+      "pronouns": "she/her",
+      "loc": "Stonetop",
+      "size": 11,
+      "portrait": "",
+      "body": "Wynn's elder sister"
+    },
+    {
+      "id": "Betrys",
+      "group": "elder",
+      "age": 72,
+      "pronouns": "she/her",
+      "loc": "Stonetop",
+      "size": 12,
+      "portrait": "",
+      "body": "Elder of the village and head of the family."
     }
   ],
   "links": [
@@ -1241,7 +1291,7 @@ const NPC_DATA = {
     },
     {
       "source": "Soinad",
-      "target": "dia",
+      "target": "Dai",
       "type": "kin",
       "label": "mother"
     },
@@ -1266,7 +1316,7 @@ const NPC_DATA = {
     },
     {
       "source": "Wynn",
-      "target": "dia",
+      "target": "Dai",
       "type": "friend",
       "label": "close friends"
     },
@@ -1327,6 +1377,78 @@ const NPC_DATA = {
       "target": "Wynn",
       "type": "secret",
       "label": "friendly; she watches the newcomer"
+    },
+    {
+      "source": "Owain",
+      "target": "Wynn",
+      "type": "kin",
+      "label": "Brother"
+    },
+    {
+      "source": "Owain",
+      "target": "Bran",
+      "type": "kin",
+      "label": "Son"
+    },
+    {
+      "source": "Owain",
+      "target": "Mair",
+      "type": "kin",
+      "label": "Son"
+    },
+    {
+      "source": "Garet",
+      "target": "Wynn",
+      "type": "kin",
+      "label": "Brother"
+    },
+    {
+      "source": "Garet",
+      "target": "Mair",
+      "type": "kin",
+      "label": "Son"
+    },
+    {
+      "source": "Garet",
+      "target": "Bran",
+      "type": "kin",
+      "label": "Son"
+    },
+    {
+      "source": "Awstin",
+      "target": "Wynn",
+      "type": "kin",
+      "label": "Brother"
+    },
+    {
+      "source": "Awstin",
+      "target": "Bran",
+      "type": "kin",
+      "label": "Son"
+    },
+    {
+      "source": "Awstin",
+      "target": "Mair",
+      "type": "kin",
+      "label": "Son"
+    },
+    {
+      "source": "Cadi (the younger)",
+      "target": "Bran",
+      "type": "kin",
+      "label": "Daughter"
+    },
+    {
+      "source": "Cadi (the younger)",
+      "target": "Mair",
+      "type": "kin",
+      "label": "Daughter"
+    },
+    {
+      "source": "Betrys",
+      "target": "Wynn",
+      "type": "kin",
+      "label": "Great-Grandmother"
     }
   ]
 };
